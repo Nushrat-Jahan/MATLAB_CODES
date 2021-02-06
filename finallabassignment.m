@@ -1,0 +1,102 @@
+transmitted_msg= 'RID'
+x=asc2bin(transmitted_msg);
+% using synchronous form for transmission B=8 %
+bp=1;
+% bit period
+disp(' Binary information at Transmitter :');
+disp(x);
+%XX representation of transmitting binary information as digital signal XXX
+
+bit=[];
+for n=1:1:length(x)
+ if x(n)==1;
+ se=3*ones(1,100);
+ else x(n)==0;
+ se=zeros(1,100);
+ end
+ bit=[bit se];
+end
+t1=bp/100:bp/100:100*length(x)*(bp/100);
+subplot(4,1,1);
+plot(t1,bit,'lineWidth',2.5);grid on;
+axis([ 0 bp*length(x) 0 6]);
+ylabel('amplitude(volt)');
+xlabel(' time(sec)');
+title('Transmitting information as digital signal');
+%now using FSK "E=5"%
+A = 1; %amplitude of carrier signal%
+B=9; %amplitude of message signal%
+
+
+br=1/bp;
+f1=br*20;
+f2=br*10;
+t2=bp/99:bp/99:bp;
+ss=length(t2);
+m=[];
+for (i=1:1:length(x))
+ if (x(i)==1)
+ y=A*cos(2*pi*f1*t2);
+ else
+ y=A*cos(2*pi*f2*t2);
+ end
+ m=[m y];
+end
+t3=bp/99:bp/99:bp*length(x);
+subplot(4,1,2);
+plot(t3,m);
+axis([ 0 bp*length(x) -6 6]);
+xlabel('Time(sec)');
+ylabel('Amplitude(volt)');
+title('Transmitting Signal after FSK Modulation');
+
+
+
+
+%Adding noise AB=18%
+mr=awgn(m,18);
+subplot(4,1,3);
+plot(t3,mr);
+axis([0 bp*length(x) -6 6]);
+xlabel('Time(sec)');
+ylabel('Amplitude(volt)');
+title('Received signal at Receiver');
+%FSK demodulation%
+mn=[];
+for n=ss:ss:length(mr)
+ t=bp/99:bp/99:bp;
+ y1=A*cos(2*pi*f1*t);
+ y2=A*cos(2*pi*f2*t);
+ mm=y1.*mr((n-(ss-1)):n);
+ mmm=y2.*mr((n-(ss-1)):n);
+ t4=bp/99:bp/99:bp;
+ z1=trapz(t4,mm);
+ z2=trapz(t4,mmm) ;
+ zz1=round((2*z1/bp));
+ zz2=round((2*z2/bp));
+ if(zz1>A/2);
+ a=1;
+ else (zz2 >A/2);
+ a=0;
+ end
+ mn=[mn a];
+end
+%Digital signal after transmission%
+%Digital signal after transmission
+bit1=[];
+for n=1:1:length(mn)
+ if mn(n)==1;
+ se1=3*ones(1,100);
+ else x(n)==0;
+ se1=zeros(1,100);
+ end
+ bit1=[bit1 se1];
+end
+t5=bp/100:bp/100:100*length(mn)*(bp/100);
+subplot(4,1,4)
+plot(t1,bit,'lineWidth',2.5);grid on;
+ylabel('Amplitude(volt)');
+xlabel(' Time(sec)');
+title('Demodulated signal at receiver');
+%Binary decoding and received message
+received_message = bin2asc(mn)

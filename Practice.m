@@ -1,0 +1,14 @@
+fs = 1000;
+t = 0:1/fs:1-1/fs;
+x1 = 7*sin(2*pi*7*t);
+x2 = 6*cos(2*pi*9*t);
+x3 = 9*sin(2*pi*6*t+pi/2);
+y = x1+x2+x3;
+fy = fft(y);
+fy = fftshift(fy)/(fs/2);
+f = fs/2*linspace(-1, 1, fs);
+plot(f, abs(fy), 'LineWidth', 1);
+title("plotting a graph");
+xlabel("Amplitude");
+ylabel("Frequency");
+bw = obw(y, fs);
